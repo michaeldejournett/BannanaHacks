@@ -1,32 +1,3 @@
-<<<<<<< HEAD
-from fastapi import File, UploadFile
-from fastapi.routing import APIRouter
-
-router = APIRouter()
-
-@router.post("/bananaAnalysis")
-async def bananaAnalysis(file: UploadFile = File(...)):
-    """
-    Controller for analyzing banana images.
-    Accepts PNG or JPEG images as input.
-    """
-    # Validate file type
-    if file.content_type not in ["image/png", "image/jpeg", "image/jpg"]:
-        return {"error": "Invalid file type. Please upload a PNG or JPEG image."}
-    
-    # Read the file content
-    contents = await file.read()
-    
-    # Process the image here (placeholder for now)
-    # You can add your image analysis logic here
-    
-    return {
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "size": len(contents),
-        "message": "Image received successfully"
-    }
-=======
 """
 Banana Analysis Controller for FastAPI.
 Handles image uploads and banana ripeness prediction.
@@ -36,23 +7,53 @@ import os
 import sys
 from pathlib import Path
 from typing import Optional
-import torch
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from PIL import Image
-import torchvision.transforms as transforms
 import io
 
-# Add parent directory to path to import model
-sys.path.append(str(Path(__file__).parent.parent.parent))
-from src.models.model import BananaRipenessModel
+# Lazy import for PIL
+Image = None
+
+# Lazy imports for torch - only import when needed
+torch = None
+transforms = None
+BananaRipenessModel = None
+
+def _import_pil():
+    """Lazy import PIL (Pillow)."""
+    global Image
+    if Image is None:
+        try:
+            from PIL import Image
+        except ImportError:
+            raise HTTPException(
+                status_code=500,
+                detail="Pillow (PIL) not available. Please install pillow."
+            )
+    return Image
+
+def _import_torch():
+    """Lazy import torch and related modules."""
+    global torch, transforms, BananaRipenessModel
+    if torch is None:
+        try:
+            import torch
+            import torchvision.transforms as transforms
+            # Add parent directory to path to import model
+            sys.path.append(str(Path(__file__).parent.parent.parent))
+            from src.models.model import BananaRipenessModel
+        except ImportError as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"PyTorch not available: {str(e)}. Please install torch and torchvision."
+            )
+    return torch, transforms, BananaRipenessModel
 
 router = APIRouter(prefix="/api/banana", tags=["banana"])
 
 # Model configuration
 MODEL_CHECKPOINT_PATH = os.getenv("MODEL_CHECKPOINT_PATH", "checkpoints/best_model.pth")
 NUM_CLASSES = int(os.getenv("NUM_CLASSES", "5"))
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Class names for ripeness levels (adjust based on your model)
 RIPENESS_CLASSES = [
@@ -67,18 +68,21 @@ RIPENESS_CLASSES = [
 _model: Optional[BananaRipenessModel] = None
 
 
-def load_model() -> BananaRipenessModel:
+def load_model():
     """Load the banana ripeness model."""
     global _model
     if _model is None:
+        torch, _, BananaRipenessModel = _import_torch()
+        
         if not os.path.exists(MODEL_CHECKPOINT_PATH):
             raise FileNotFoundError(
                 f"Model checkpoint not found at {MODEL_CHECKPOINT_PATH}. "
                 "Please train the model first or set MODEL_CHECKPOINT_PATH environment variable."
             )
         
-        _model = BananaRipenessModel(num_classes=NUM_CLASSES).to(DEVICE)
-        checkpoint = torch.load(MODEL_CHECKPOINT_PATH, map_location=DEVICE)
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        _model = BananaRipenessModel(num_classes=NUM_CLASSES).to(device)
+        checkpoint = torch.load(MODEL_CHECKPOINT_PATH, map_location=device)
         _model.load_state_dict(checkpoint['model_state_dict'])
         _model.eval()
         print(f"Model loaded successfully from {MODEL_CHECKPOINT_PATH}")
@@ -86,7 +90,7 @@ def load_model() -> BananaRipenessModel:
     return _model
 
 
-def preprocess_image(image_bytes: bytes) -> torch.Tensor:
+def preprocess_image(image_bytes: bytes):
     """
     Preprocess an image for inference.
     
@@ -94,8 +98,11 @@ def preprocess_image(image_bytes: bytes) -> torch.Tensor:
         image_bytes: Image file bytes
         
     Returns:
-        torch.Tensor: Preprocessed image tensor
+        Preprocessed image tensor
     """
+    Image = _import_pil()
+    _, transforms, _ = _import_torch()
+    
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -133,8 +140,12 @@ async def analyze_banana(file: UploadFile = File(...)):
         # Read image bytes
         image_bytes = await file.read()
         
+        # Import torch
+        torch, _, _ = _import_torch()
+        
         # Preprocess image
-        image_tensor = preprocess_image(image_bytes).to(DEVICE)
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        image_tensor = preprocess_image(image_bytes).to(device)
         
         # Load model (lazy loading)
         model = load_model()
@@ -183,16 +194,16 @@ async def analyze_banana(file: UploadFile = File(...)):
 async def health_check():
     """Health check endpoint."""
     try:
+        torch, _, _ = _import_torch()
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model = load_model()
         return {
             "status": "healthy",
             "model_loaded": model is not None,
-            "device": str(DEVICE)
+            "device": str(device)
         }
     except Exception as e:
         return {
             "status": "unhealthy",
             "error": str(e)
         }
->>>>>>> web
-

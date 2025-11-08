@@ -17,9 +17,6 @@ app.add_middleware(
 # Include routers
 app.include_router(banana_router)
 
-# Include routers
-app.include_router(banana_analysis_router)
-
 @app.get("/")
 async def root():
     return {"message": "Banana Hacks API - Banana Ripeness Detection"}
