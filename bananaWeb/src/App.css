@@ -1,0 +1,554 @@
+.app-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.header {
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.banana-emoji {
+  font-size: 4rem;
+  animation: bananaBounce 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+.banana-emoji:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.banana-emoji:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  color: #FFD700;
+  margin-top: 1rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.card {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 20px;
+  padding: 3rem;
+  margin: 2rem 0;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              0 0 20px rgba(255, 215, 0, 0.1);
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-area {
+  width: 100%;
+  max-width: 500px;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  border: 3px dashed rgba(255, 215, 0, 0.4);
+  border-radius: 20px;
+  background: rgba(20, 20, 20, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+  border-color: rgba(255, 215, 0, 0.7);
+  background: rgba(30, 30, 30, 0.6);
+  transform: translateY(-2px);
+}
+
+.upload-icon {
+  font-size: 4rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.upload-subtitle {
+  font-size: 1rem;
+  color: #b0b0b0;
+}
+
+.image-preview-container {
+  position: relative;
+  max-width: 500px;
+  max-height: 500px;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.remove-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(220, 20, 20, 0.9);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.remove-button:hover {
+  background: rgba(255, 40, 40, 1);
+  transform: scale(1.1);
+}
+
+.image-name {
+  color: #FFD700;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  word-break: break-all;
+}
+
+.change-image-button {
+  margin-top: 1rem;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 215, 0, 0.3);
+  border-top-color: #FFD700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #FFD700;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.error-text {
+  color: #ff6b6b;
+  font-size: 1.1rem;
+  margin: 0;
+  text-align: center;
+}
+
+.analysis-result {
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.result-card {
+  background: rgba(30, 30, 30, 0.9);
+  border-radius: 15px;
+  padding: 2rem;
+  border: 2px solid;
+  margin-bottom: 1rem;
+}
+
+.result-card.success {
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.result-card.warning {
+  border-color: rgba(255, 165, 0, 0.5);
+  box-shadow: 0 0 20px rgba(255, 165, 0, 0.2);
+}
+
+.result-title {
+  color: #FFD700;
+  font-size: 1.8rem;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.ripeness-info {
+  margin-bottom: 2rem;
+}
+
+.ripeness-level,
+.confidence {
+  color: #e0e0e0;
+  font-size: 1.2rem;
+  margin: 0.75rem 0;
+  text-align: center;
+}
+
+.ripeness-value,
+.confidence-value {
+  color: #FFD700;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.probabilities {
+  margin-top: 2rem;
+}
+
+.probabilities-title {
+  color: #FFD700;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.probabilities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.probability-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #e0e0e0;
+}
+
+.prob-level {
+  min-width: 120px;
+  font-size: 0.95rem;
+}
+
+.prob-bar-container {
+  flex: 1;
+  height: 20px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.prob-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.prob-value {
+  min-width: 50px;
+  text-align: right;
+  color: #FFD700;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.not-banana-message {
+  color: #ffa500;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 0;
+}
+
+.analyze-button,
+.retry-button {
+  margin-top: 1rem;
+}
+
+.project-goal-card {
+  text-align: left;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.project-goal-title {
+  color: #FFD700;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.project-goal-text {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.hackathon-name {
+  display: inline;
+  white-space: nowrap;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: #888;
+  text-decoration-color: #FFD700;
+  text-decoration-thickness: 2px;
+  display: inline;
+}
+
+.slanted {
+  font-style: italic;
+  color: #FFD700;
+  font-weight: 600;
+  transform: skewX(-10deg);
+  display: inline;
+  margin-left: 0.5rem;
+}
+
+.banana-button {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #1a1a1a;
+  border: none;
+  border-radius: 15px;
+  padding: 1rem 2.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  font-family: inherit;
+}
+
+.banana-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6);
+  background: linear-gradient(135deg, #FFE135 0%, #FFB347 100%);
+}
+
+.banana-button:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.description {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.feature-card {
+  background: rgba(30, 30, 30, 0.7);
+  border-radius: 15px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.feature-card:nth-child(2) .feature-icon {
+  animation-delay: 0.5s;
+}
+
+.feature-card:nth-child(3) .feature-icon {
+  animation-delay: 1s;
+}
+
+.feature-card h3 {
+  color: #FFD700;
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.feature-card p {
+  color: #b0b0b0;
+  margin: 0;
+  font-size: 1rem;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bananaBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(10deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .banana-emoji {
+    font-size: 2.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .card {
+    padding: 2rem;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+  }
+  
+  .upload-label {
+    padding: 2rem 1.5rem;
+  }
+  
+  .upload-icon {
+    font-size: 3rem;
+  }
+  
+  .upload-title {
+    font-size: 1.2rem;
+  }
+  
+  .image-preview-container {
+    max-width: 100%;
+    max-height: 400px;
+  }
+  
+  .project-goal-title {
+    font-size: 1.5rem;
+  }
+  
+  .project-goal-text {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .hackathon-name {
+    display: inline;
+  }
+}
