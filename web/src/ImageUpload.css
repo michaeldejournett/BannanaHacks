@@ -1,0 +1,133 @@
+.image-upload-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 2rem 0;
+}
+
+.upload-area {
+  border: 3px dashed rgba(255, 215, 0, 0.5);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  background: rgba(30, 25, 15, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-area:hover {
+  border-color: rgba(255, 215, 0, 0.8);
+  background: rgba(30, 25, 15, 0.7);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.upload-area.has-image {
+  border-color: rgba(255, 215, 0, 0.8);
+  padding: 0;
+  background: transparent;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  opacity: 0.7;
+}
+
+.upload-text {
+  color: #ffd700;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.upload-hint {
+  color: rgba(255, 215, 0, 0.6);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.preview-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 8px;
+  object-fit: contain;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.preview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0 0 8px 8px;
+}
+
+.file-name {
+  color: #ffd700;
+  font-size: 0.9rem;
+  margin: 0;
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 1rem;
+}
+
+.remove-button {
+  border-radius: 6px;
+  border: 2px solid rgba(255, 100, 100, 0.7);
+  padding: 0.4em 1em;
+  font-size: 0.9em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: rgba(200, 50, 50, 0.3);
+  color: #ffaaaa;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+
+.remove-button:hover {
+  border-color: rgba(255, 100, 100, 1);
+  background-color: rgba(200, 50, 50, 0.5);
+  color: #ffcccc;
+  transform: translateY(-1px);
+}
+
+.remove-button:active {
+  transform: translateY(0);
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(200, 50, 50, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 100, 100, 0.5);
+  text-align: center;
+}
+
