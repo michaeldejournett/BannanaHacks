@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Ripeness Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍌 Banana Ripeness Classifier</h1>
+            <p>Upload an image of a banana to determine its ripeness level</p>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload or drag and drop</p>
+                        <p class="file-info">PNG, JPG, JPEG up to 16MB</p>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+                
+                <div class="preview-section" id="previewSection" style="display: none;">
+                    <img id="previewImage" src="" alt="Preview">
+                    <button class="btn-remove" id="removeBtn">Remove</button>
+                </div>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h2>Prediction Results</h2>
+                <div class="result-card">
+                    <div class="ripeness-badge" id="ripenessBadge">
+                        <span class="ripeness-label" id="ripenessLabel"></span>
+                        <span class="confidence" id="confidence"></span>
+                    </div>
+                    
+                    <div class="probabilities">
+                        <h3>All Probabilities</h3>
+                        <div class="prob-bars" id="probBars"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing banana...</p>
+            </div>
+
+            <div class="error" id="error" style="display: none;">
+                <p id="errorMessage"></p>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+
