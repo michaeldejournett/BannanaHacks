@@ -1,5 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import List
+from PIL import Image
+import io
+import sys
+from pathlib import Path
+
+# Add parent directory to path to import utils
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.model_loader import predict_banana, load_model
 
 router = APIRouter()
 
@@ -42,18 +50,63 @@ async def analyze_banana(file: UploadFile = File(...)):
     Upload a banana image for analysis.
     
     Accepts PNG, JPEG, or JPG image files.
+    Uses the bananaOrNot.pth model to detect if the image contains a banana.
     
     Args:
         file: The image file to upload
         
     Returns:
-        Success message if file is valid, error message otherwise
+        Dictionary with detection results:
+        {
+            "message": "success" or "error",
+            "is_banana": bool (if successful),
+            "confidence": float (if successful),
+            "class_name": str (if successful)
+        }
     """
     # Validate file type
     if not is_valid_image_file(file):
-        return {"message": "error"}
+        return {
+            "message": "error",
+            "error": "Invalid file type. Please upload a PNG, JPEG, or JPG file."
+        }
     
-    # File is valid - return success
-    # Note: The actual file processing/scanning will be handled elsewhere
-    return {"message": "successful upload!"}
+    try:
+        # Read the uploaded file
+        contents = await file.read()
+        
+        # Open image with PIL
+        image = Image.open(io.BytesIO(contents))
+        
+        # Ensure model is loaded
+        try:
+            load_model()
+        except Exception as e:
+            return {
+                "message": "error",
+                "error": f"Model loading failed: {str(e)}"
+            }
+        
+        # Make prediction
+        try:
+            result = predict_banana(image)
+            
+            return {
+                "message": "success",
+                "is_banana": result["is_banana"],
+                "confidence": result["confidence"],
+                "class_name": result["class_name"],
+                "probabilities": result["probabilities"]
+            }
+        except Exception as e:
+            return {
+                "message": "error",
+                "error": f"Prediction failed: {str(e)}"
+            }
+            
+    except Exception as e:
+        return {
+            "message": "error",
+            "error": f"Image processing failed: {str(e)}"
+        }
 
