@@ -1,13 +1,28 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import FallingBananas from './components/FallingBananas'
 import './App.css'
 
+interface AnalysisResult {
+  is_banana: boolean
+  ripeness_level: string
+  confidence: number
+  predicted_class: number
+  all_probabilities: Record<string, number>
+  message: string
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 function App() {
   const [image, setImage] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [imageName, setImageName] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       // Validate file type
@@ -20,7 +35,48 @@ function App() {
       // Create object URL for preview
       const imageUrl = URL.createObjectURL(file)
       setImage(imageUrl)
+      setImageFile(file)
       setImageName(file.name)
+      setAnalysisResult(null)
+      setError(null)
+
+      // Automatically analyze the image
+      await analyzeImage(file)
+    }
+  }
+
+  const analyzeImage = async (file: File) => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch(`${API_BASE_URL}/api/banana/analyze`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }))
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+      }
+
+      const result: AnalysisResult = await response.json()
+      setAnalysisResult(result)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze image'
+      setError(errorMessage)
+      console.error('Error analyzing image:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReanalyze = () => {
+    if (imageFile) {
+      analyzeImage(imageFile)
     }
   }
 
@@ -29,11 +85,23 @@ function App() {
       URL.revokeObjectURL(image)
     }
     setImage(null)
+    setImageFile(null)
     setImageName('')
+    setAnalysisResult(null)
+    setError(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
   }
+
+  useEffect(() => {
+    // Cleanup object URL on unmount
+    return () => {
+      if (image) {
+        URL.revokeObjectURL(image)
+      }
+    }
+  }, [image])
 
   return (
     <div className="app-container">
@@ -86,11 +154,88 @@ function App() {
                   </button>
                 </div>
                 <p className="image-name">{imageName}</p>
+                
+                {loading && (
+                  <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                    <p className="loading-text">Analyzing banana...</p>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="error-container">
+                    <p className="error-text">❌ {error}</p>
+                    <button 
+                      className="banana-button retry-button"
+                      onClick={handleReanalyze}
+                    >
+                      🔄 Retry Analysis
+                    </button>
+                  </div>
+                )}
+
+                {analysisResult && !loading && (
+                  <div className="analysis-result">
+                    <div className={`result-card ${analysisResult.is_banana ? 'success' : 'warning'}`}>
+                      <h3 className="result-title">
+                        {analysisResult.is_banana ? '🍌 Banana Detected!' : '⚠️ Not a Banana'}
+                      </h3>
+                      {analysisResult.is_banana && (
+                        <>
+                          <div className="ripeness-info">
+                            <p className="ripeness-level">
+                              Ripeness Level: <span className="ripeness-value">{analysisResult.ripeness_level}</span>
+                            </p>
+                            <p className="confidence">
+                              Confidence: <span className="confidence-value">{(analysisResult.confidence * 100).toFixed(1)}%</span>
+                            </p>
+                          </div>
+                          <div className="probabilities">
+                            <p className="probabilities-title">All Ripeness Levels:</p>
+                            <div className="probabilities-list">
+                              {Object.entries(analysisResult.all_probabilities).map(([level, prob]) => (
+                                <div key={level} className="probability-item">
+                                  <span className="prob-level">{level}:</span>
+                                  <div className="prob-bar-container">
+                                    <div 
+                                      className="prob-bar" 
+                                      style={{ width: `${prob * 100}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="prob-value">{(prob * 100).toFixed(1)}%</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      {!analysisResult.is_banana && (
+                        <p className="not-banana-message">{analysisResult.message}</p>
+                      )}
+                    </div>
+                    <button 
+                      className="banana-button retry-button"
+                      onClick={handleReanalyze}
+                    >
+                      🔄 Reanalyze
+                    </button>
+                  </div>
+                )}
+
+                {!loading && !analysisResult && !error && (
+                  <button 
+                    className="banana-button analyze-button"
+                    onClick={handleReanalyze}
+                  >
+                    🍌 Analyze Banana
+                  </button>
+                )}
+
                 <button 
                   className="banana-button change-image-button"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  🍌 Change Image
+                  📁 Change Image
                 </button>
               </>
             )}
