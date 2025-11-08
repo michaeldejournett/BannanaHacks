@@ -1,0 +1,84 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background: linear-gradient(135deg, #1a1a0a 0%, #2d2d1a 50%, #1a1a0a 100%);
+  background-color: #1a1a0a;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #ffd700;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #ffed4e;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a0a 0%, #2d2d1a 50%, #1a1a0a 100%);
+  background-color: #1a1a0a;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: rgba(30, 25, 15, 0.8);
+  color: #ffd700;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+button:hover {
+  border-color: #ffd700;
+  background-color: rgba(40, 35, 20, 0.9);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  transform: translateY(-2px);
+}
+button:active {
+  transform: translateY(0);
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto rgba(255, 215, 0, 0.5);
+}
+
+code {
+  background-color: rgba(30, 25, 15, 0.6);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}

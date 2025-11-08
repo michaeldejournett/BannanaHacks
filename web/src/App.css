@@ -1,0 +1,86 @@
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5),
+               0 0 20px rgba(255, 215, 0, 0.3);
+  margin-bottom: 2rem;
+}
+
+.card {
+  padding: 2em;
+  background: rgba(30, 25, 15, 0.7);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.read-the-docs {
+  color: #ffd700;
+  opacity: 0.8;
+  margin-top: 2rem;
+}
+
+.card h2 {
+  color: #ffd700;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.8em;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.upload-description {
+  color: rgba(255, 215, 0, 0.7);
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.status-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.status-message.uploading {
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.status-message.success {
+  color: #90ee90;
+  background: rgba(144, 238, 144, 0.1);
+  border: 2px solid rgba(144, 238, 144, 0.3);
+}
+
+.status-message.error {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border: 2px solid rgba(255, 107, 107, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
