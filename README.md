@@ -41,3 +41,14 @@ This is a blank PyTorch project template. Add your banana ripeness detection mod
 - Pillow >= 10.0.0
 - Matplotlib >= 3.7.0
 - tqdm >= 4.65.0
+
+## HOW TO RUN
+
+### FastAPI
+```console
+python -m uvicorn main:app --reload
+```
+### WebDev
+```console
+npm run dev
+```
