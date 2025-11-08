@@ -46,3 +46,41 @@ h1 {
   margin-top: 1.5rem;
   font-size: 0.95rem;
 }
+
+.status-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.status-message.uploading {
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.status-message.success {
+  color: #90ee90;
+  background: rgba(144, 238, 144, 0.1);
+  border: 2px solid rgba(144, 238, 144, 0.3);
+}
+
+.status-message.error {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border: 2px solid rgba(255, 107, 107, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

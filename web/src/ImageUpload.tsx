@@ -3,9 +3,10 @@ import './ImageUpload.css';
 
 interface ImageUploadProps {
   onImageSelect?: (file: File) => void;
+  onImageRemove?: () => void;
 }
 
-export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
+export default function ImageUpload({ onImageSelect, onImageRemove }: ImageUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +102,7 @@ export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    onImageRemove?.();
   };
 
   return (
