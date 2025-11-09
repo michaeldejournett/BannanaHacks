@@ -11,7 +11,14 @@ os.environ['HSA_ENABLE_SDMA'] = '0'
 os.environ['HSA_ENABLE_INTERRUPT'] = '0'
 
 import sys
-sys.path.insert(0, 'Model')
+
+# Get the script's directory and project root
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)  # Go up one level from Scripts to BannanaHacks
+model_dir = os.path.join(project_root, 'Model')
+
+# Add Model directory to path
+sys.path.insert(0, model_dir)
 
 import torch
 from src.data.dataset import get_data_loaders
@@ -22,9 +29,9 @@ print("Testing with actual dataset...")
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
-# Load actual data
-train_dir = "../data/raw/Banana Ripeness Classification Dataset/train"
-val_dir = "../data/raw/Banana Ripeness Classification Dataset/valid"
+# Load actual data - paths relative to project root
+train_dir = os.path.join(project_root, "data/raw/Banana Ripeness Classification Dataset/train")
+val_dir = os.path.join(project_root, "data/raw/Banana Ripeness Classification Dataset/valid")
 
 print("\nLoading data loaders...")
 try:

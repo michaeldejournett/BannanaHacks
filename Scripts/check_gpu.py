@@ -69,7 +69,7 @@ def check_gpu_status():
         print("   ls -la /dev/dri/")
         print("\n3. Try different GFX version override:")
         print("   export HSA_OVERRIDE_GFX_VERSION=10.3.0")
-        print("   python check_gpu.py")
+        print("   python Scripts/check_gpu.py")
         print("\n4. Verify PyTorch ROCm installation:")
         print("   python -c \"import torch; print(torch.__version__); print(hasattr(torch.version, 'hip'))\"")
     

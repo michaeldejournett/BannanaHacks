@@ -8,11 +8,15 @@ import os
 import shutil
 from pathlib import Path
 
-# Paths
-BANANA_TRAIN_DIR = "data/raw/Banana Ripeness Classification Dataset/train/ripe"
-BANANA_VAL_DIR = "data/raw/Banana Ripeness Classification Dataset/valid/ripe"
+# Get the script's directory and project root
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)  # Go up one level from Scripts to BannanaHacks
+
+# Paths relative to project root
+BANANA_TRAIN_DIR = os.path.join(project_root, "data/raw/Banana Ripeness Classification Dataset/train/ripe")
+BANANA_VAL_DIR = os.path.join(project_root, "data/raw/Banana Ripeness Classification Dataset/valid/ripe")
 GARBAGE_DIR = "/home/michaeldejournett/.cache/kagglehub/datasets/asdasdasasdas/garbage-classification/versions/2"
-BINARY_DATA_DIR = "data/binary_classification"
+BINARY_DATA_DIR = os.path.join(project_root, "data/binary_classification")
 
 def find_images(directory, extensions=('.jpg', '.jpeg', '.png', '.bmp')):
     """Find all image files in a directory recursively."""
