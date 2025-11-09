@@ -95,18 +95,32 @@ async def analyze_banana(file: UploadFile = File(...)):
         # Make prediction
         try:
             result = predict_banana(image)
-            
+
+            if result is None:
+                return {
+                    "message": "error",
+                    "error": "Prediction failed: no result returned from model"
+                }
+
+            ripeness = result.get("ripeness")  # may be None or dict
+            ripeness_available = ripeness is not None
+
+            ripeness_payload = None
+            if ripeness_available and isinstance(ripeness, dict):
+                ripeness_payload = {
+                    "stage": ripeness.get("ripeness_stage"),
+                    "confidence": ripeness.get("confidence"),
+                    "probabilities": ripeness.get("probabilities")
+                }
+
             return {
                 "message": "success",
-                "is_banana": result["is_banana"],
-                "confidence": result["confidence"],
-                "class_name": result["class_name"],
-                "probabilities": result["probabilities"],
-                "ripeness": {
-                    "stage": result.get("ripeness", {}).get("ripeness_stage"),
-                    "confidence": result.get("ripeness", {}).get("confidence"),
-                    "probabilities": result.get("ripeness", {}).get("probabilities")
-                }
+                "is_banana": result.get("is_banana"),
+                "confidence": result.get("confidence"),
+                "class_name": result.get("class_name"),
+                "probabilities": result.get("probabilities"),
+                "ripeness_available": ripeness_available,
+                "ripeness": ripeness_payload,
             }
         except Exception as e:
             return {

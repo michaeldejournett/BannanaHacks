@@ -223,13 +223,23 @@ def predict_banana(image: Image.Image) -> Dict[str, any]:
         'probabilities': {
             CLASS_NAMES[i]: float(all_probs[i]) for i in range(len(CLASS_NAMES))
         },
-        'ripeness': None  # Default to None
+        # ripeness is None when the image is not a banana. This prevents
+        # unnecessary loading/calls to the ripeness model and makes intent explicit.
+        'ripeness': None
     }
 
-    # If a banana is detected, predict ripeness
+    # If a banana is detected, predict ripeness and populate the field.
     if is_banana:
         load_ripeness_model()  # Ensure ripeness model is loaded
-        result['ripeness'] = predict_ripeness(image)
+        try:
+            ripeness_result = predict_ripeness(image)
+            # guard: ensure predict_ripeness returns a dict
+            if isinstance(ripeness_result, dict):
+                result['ripeness'] = ripeness_result
+        except Exception:
+            # On any ripeness prediction error, leave ripeness as None so the API
+            # layer can decide how to present the failure to the client.
+            result['ripeness'] = None
 
     return result
 
