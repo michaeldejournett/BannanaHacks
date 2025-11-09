@@ -39,6 +39,8 @@ CLASS_NAMES = ['banana', 'not_banana']
 _model = None
 _device = None
 _transform = None
+# Global variable for the ripeness model
+_ripeness_model = None
 
 
 def get_device() -> torch.device:
@@ -111,50 +113,123 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
     return image_tensor
 
 
+def load_ripeness_model() -> None:
+    """Load the ripeness classification model."""
+    global _ripeness_model, _device
+
+    if _ripeness_model is not None:
+        return  # Ripeness model already loaded
+
+    # Model checkpoint path for ripeness
+    ripeness_checkpoint_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'Ripeness.pth')
+
+    if not os.path.exists(ripeness_checkpoint_path):
+        raise FileNotFoundError(f"Ripeness model checkpoint not found: {ripeness_checkpoint_path}")
+
+    # Load ripeness model
+    print(f"Loading ripeness model from: {ripeness_checkpoint_path}")
+    checkpoint = torch.load(ripeness_checkpoint_path, map_location=_device)
+    num_classes = checkpoint['model_state_dict']['fc2.weight'].shape[0]  # Dynamically determine number of classes
+    _ripeness_model = BananaRipenessModel(num_classes=num_classes).to(_device)
+    _ripeness_model.load_state_dict(checkpoint['model_state_dict'])
+    _ripeness_model.eval()
+    print("✓ Ripeness model loaded successfully!")
+
+
+def predict_ripeness(image: Image.Image) -> Dict[str, any]:
+    """
+    Predict the ripeness of a banana image.
+
+    Args:
+        image: PIL Image object
+
+    Returns:
+        Dictionary with ripeness prediction results:
+        {
+            'ripeness_stage': int,
+            'confidence': float,
+            'probabilities': dict
+        }
+    """
+    if _ripeness_model is None or _device is None:
+        raise RuntimeError("Ripeness model not loaded. Call load_ripeness_model() first.")
+
+    # Preprocess image
+    image_tensor = preprocess_image(image).to(_device)
+
+    # Make prediction
+    with torch.no_grad():
+        outputs = _ripeness_model(image_tensor)
+        probabilities = torch.nn.functional.softmax(outputs, dim=1)
+        confidence, predicted_stage = torch.max(probabilities, 1)
+
+    predicted_stage = predicted_stage.item()
+    confidence = confidence.item()
+    all_probs = probabilities.cpu().numpy()[0]
+
+    # Format results
+    result = {
+        'ripeness_stage': predicted_stage,
+        'confidence': confidence,
+        'probabilities': {
+            f"stage_{i}": float(all_probs[i]) for i in range(len(all_probs))
+        }
+    }
+
+    return result
+
+
 def predict_banana(image: Image.Image) -> Dict[str, any]:
     """
     Make a prediction on a PIL image.
-    
+
     Args:
         image: PIL Image object
-        
+
     Returns:
         Dictionary with prediction results:
         {
             'is_banana': bool,
             'class_name': str,
             'confidence': float,
-            'probabilities': dict
+            'probabilities': dict,
+            'ripeness': Optional[dict]  # Ripeness prediction results if a banana is detected
         }
     """
     if _model is None or _device is None:
         raise RuntimeError("Model not loaded. Call load_model() first.")
-    
+
     # Preprocess image
     image_tensor = preprocess_image(image).to(_device)
-    
+
     # Make prediction
     with torch.no_grad():
         outputs = _model(image_tensor)
         probabilities = torch.nn.functional.softmax(outputs, dim=1)
         confidence, predicted_class = torch.max(probabilities, 1)
-    
+
     predicted_class = predicted_class.item()
     confidence = confidence.item()
     all_probs = probabilities.cpu().numpy()[0]
-    
+
     # Format results
     class_name = CLASS_NAMES[predicted_class]
     is_banana = class_name == 'banana'
-    
+
     result = {
         'is_banana': is_banana,
         'class_name': class_name,
         'confidence': confidence,
         'probabilities': {
             CLASS_NAMES[i]: float(all_probs[i]) for i in range(len(CLASS_NAMES))
-        }
+        },
+        'ripeness': None  # Default to None
     }
-    
+
+    # If a banana is detected, predict ripeness
+    if is_banana:
+        load_ripeness_model()  # Ensure ripeness model is loaded
+        result['ripeness'] = predict_ripeness(image)
+
     return result
 

@@ -167,3 +167,56 @@ h1 {
   color: #ffd700;
   font-weight: bold;
 }
+
+.ripeness-result {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(30, 25, 15, 0.8);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  animation: fadeIn 0.5s ease-in;
+}
+
+.ripeness-result h3 {
+  color: #ffd700;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.ripeness-result p {
+  color: rgba(255, 215, 0, 0.8);
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.ripeness-probabilities {
+  margin-top: 1rem;
+}
+
+.ripeness-probabilities h4 {
+  color: #ffd700;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.ripeness-probabilities ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* Match the spacing above */
+}
+
+.ripeness-probabilities li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem; /* Match the padding above */
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  color: rgba(255, 215, 0, 0.9);
+  font-weight: 500;
+}

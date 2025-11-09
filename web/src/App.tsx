@@ -13,6 +13,13 @@ interface AnalysisResult {
     banana: number;
     not_banana: number;
   };
+  ripeness: {
+    stage: string;
+    confidence: number;
+    probabilities: {
+      [stage: string]: number;
+    };
+  };
 }
 
 function App() {
@@ -50,7 +57,8 @@ function App() {
           is_banana: data.is_banana,
           confidence: data.confidence,
           class_name: data.class_name,
-          probabilities: data.probabilities
+          probabilities: data.probabilities,
+          ripeness: data.ripeness
         });
         setStatusMessage('');
       } else {
@@ -71,6 +79,8 @@ function App() {
     setStatusMessage('');
     setAnalysisResult(null);
   };
+
+  const ripenessLabels = ['Overripe', 'Ripe', 'Rotten', 'Unripe'];
 
   return (
     <>
@@ -122,6 +132,23 @@ function App() {
                     </span>
                   </div>
                 </div>
+                {analysisResult.ripeness && (
+                  <div className="ripeness-result">
+                    <h3>Ripeness Information</h3>
+                    <p>Ripeness Stage: {ripenessLabels[Number(analysisResult.ripeness.stage)]}</p>
+                    <p>Confidence: {(analysisResult.ripeness.confidence * 100).toFixed(1)}%</p>
+                    <div className="ripeness-probabilities">
+                      <h4>Stage Probabilities:</h4>
+                      <ul>
+                        {Object.entries(analysisResult.ripeness.probabilities).map(([stage, prob]) => (
+                          <li key={stage}>
+                            {ripenessLabels[parseInt(stage.replace('stage_', ''))]}: {(prob * 100).toFixed(1)}%
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

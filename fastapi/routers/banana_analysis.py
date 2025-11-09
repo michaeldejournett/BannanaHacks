@@ -61,7 +61,12 @@ async def analyze_banana(file: UploadFile = File(...)):
             "message": "success" or "error",
             "is_banana": bool (if successful),
             "confidence": float (if successful),
-            "class_name": str (if successful)
+            "class_name": str (if successful),
+            "ripeness": {
+                "stage": str,
+                "confidence": float,
+                "probabilities": List[float]
+            }
         }
     """
     # Validate file type
@@ -96,7 +101,12 @@ async def analyze_banana(file: UploadFile = File(...)):
                 "is_banana": result["is_banana"],
                 "confidence": result["confidence"],
                 "class_name": result["class_name"],
-                "probabilities": result["probabilities"]
+                "probabilities": result["probabilities"],
+                "ripeness": {
+                    "stage": result.get("ripeness", {}).get("ripeness_stage"),
+                    "confidence": result.get("ripeness", {}).get("confidence"),
+                    "probabilities": result.get("ripeness", {}).get("probabilities")
+                }
             }
         except Exception as e:
             return {
