@@ -153,7 +153,7 @@ def main():
     
     last_capture_time = 0 #last time we processed a frame
     capture_interval = 1.0 #seconds between AI scans
-    delete_delay = 10.0
+    delete_delay = 1.0
     save_dir = "Banana_Pics"
 
     clear_folder(save_dir)
