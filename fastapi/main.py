@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from routers import banana_analysis
 
@@ -45,4 +45,14 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+@app.post("/banana-analysis")
+async def banana_analysis_alias(file: UploadFile = File(...)):
+    """Compatibility alias: forwards requests from /banana-analysis to the router handler.
+
+    This allows clients still hitting /banana-analysis (without the /api prefix)
+    to work while the main router remains mounted at /api.
+    """
+    return await banana_analysis.analyze_banana(file)
 

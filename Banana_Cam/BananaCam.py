@@ -2,21 +2,131 @@ import cv2
 import time
 import os
 import shutil
+import requests
+import tkinter as tk
+from PIL import Image, ImageTk
+
+# Additional dependencies (install if missing):
+# pip install requests pillow
+# tkinter is included with most Python installs (on Windows it should be available)
+# This script will POST frames to the local FastAPI endpoint at http://127.0.0.1:8000/banana-analysis
 
 def detect_banana(frame):
     """
-    TODO: Replace this with your real AI detection
-    Return True is a bana is detected in the frame, otherwise fasle
+    Local fallback detection (keeps previous behavior).
+    This can be replaced with a local heuristic if desired.
+    Return True if a banana is detected in the frame, otherwise False
     """
     return False
 
+API_URL = "http://127.0.0.1:8000/banana-analysis"
+
+
+def call_api_for_frame(frame, api_url=API_URL, timeout=5):
+    """
+    Send the provided BGR OpenCV frame to the API as a JPEG multipart upload.
+    Returns the parsed JSON response on success, or None on error.
+    """
+    try:
+        ret, buf = cv2.imencode('.jpg', frame)
+        if not ret:
+            print("Failed to encode frame to JPEG before API call")
+            return None
+
+        jpeg_bytes = buf.tobytes()
+
+        files = {
+            'file': ('frame.jpg', jpeg_bytes, 'image/jpeg')
+        }
+
+        resp = requests.post(api_url, files=files, timeout=timeout)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        print(f"API call failed: {e}")
+        return None
+
+
 def process_frame(frame):
     """
-    This function is called every capture interval and runs it through out AI logic.
+    Called every capture interval. Uses the remote API to decide whether a banana
+    is present. Returns a tuple (banana_found: bool, payload: dict|None).
     """
-    banana_found = detect_banana(frame)
+    # Attempt remote API call first
+    result = call_api_for_frame(frame)
+    banana_found = False
+    payload = None
+
+    if result and result.get("message") == "success":
+        banana_found = bool(result.get("is_banana", False))
+        payload = result
+    else:
+        # Fallback to local heuristic
+        banana_found = detect_banana(frame)
+        payload = None
+
     print("AI processing at", time.strftime("%H:%M:%S"), "| banana_found:", banana_found)
-    return banana_found
+    return banana_found, payload
+
+
+def show_result_modal(frame, payload=None):
+    """
+    Show a modal dialog with the captured frame and analysis results.
+    Blocks until the user presses the Continue button.
+    """
+    # Ensure we have a Tk root
+    if not hasattr(show_result_modal, "_root") or show_result_modal._root is None:
+        root = tk.Tk()
+        root.withdraw()
+        show_result_modal._root = root
+    else:
+        root = show_result_modal._root
+
+    # Convert OpenCV BGR frame to PIL Image
+    try:
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        pil_img = Image.fromarray(rgb)
+    except Exception:
+        pil_img = None
+
+    top = tk.Toplevel(root)
+    top.title("Banana Detected")
+
+    # Image
+    if pil_img is not None:
+        img_tk = ImageTk.PhotoImage(pil_img.resize((400, 300)))
+        img_label = tk.Label(top, image=img_tk)
+        img_label.image = img_tk
+        img_label.pack()
+
+    # Payload text
+    text = tk.Text(top, wrap=tk.WORD, height=10, width=60)
+    payload_text = "No details available" if not payload else str(payload)
+    text.insert(tk.END, payload_text)
+    text.config(state=tk.DISABLED)
+    text.pack(padx=8, pady=8)
+
+    done = tk.Event()
+
+    def on_continue():
+        top.destroy()
+
+    # Bind keyboard shortcut 'r' or Enter to continue (keyboard fallback)
+    def on_key(event):
+        # Accept 'r' or Return/Enter
+        if event.keysym.lower() == 'r' or event.keysym == 'Return':
+            on_continue()
+
+    top.bind('<Key>', on_key)
+    top.focus_set()
+
+    btn = tk.Button(top, text="Continue", command=on_continue)
+    btn.pack(pady=6)
+
+    # Make the window modal and wait for it to be closed
+    top.transient(root)
+    top.grab_set()
+    root.wait_window(top)
 
 def clear_folder(folder_path):
     if os.path.exists(folder_path):
@@ -78,11 +188,16 @@ def main():
                 print(f"Saved frame: {filename}")
 
                 #2. Run AI on the frame
-                banana_found = process_frame(frame)
+                banana_found, payload = process_frame(frame)
 
-                #3) If no banana-> delete the file we saved
+                #3) If banana detected -> keep and show results, otherwise schedule delete
                 if banana_found:
                     print(f"Banana detected; keeping {filename}")
+                    # Show modal with results and pause until user continues
+                    try:
+                        show_result_modal(frame, payload)
+                    except Exception as e:
+                        print(f"Failed to show result modal: {e}")
                 else:
                     pending_delete[filename] = now
                     print(f"No banana; deleting {filename} in {delete_delay} seconds")
