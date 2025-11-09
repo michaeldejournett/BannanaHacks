@@ -128,6 +128,49 @@ def show_result_modal(frame, payload=None):
     top.grab_set()
     root.wait_window(top)
 
+
+def show_detected_overlay(frame, seconds=2):
+    """
+    Display the given frame with a prominent "Banana detected!" overlay
+    for the specified number of seconds, then return.
+
+    This method freezes the displayed frame (it redraws the same frame repeatedly)
+    so the user sees the detection message while the capture loop is paused.
+    Pressing 'q' during the overlay will still exit the application.
+    """
+    overlay = frame.copy()
+    h, w = overlay.shape[:2]
+
+    # Draw semi-opaque rectangle background for text
+    rect_h = int(h * 0.18)
+    cv2.rectangle(overlay, (0, h - rect_h), (w, h), (0, 0, 0), -1)
+
+    # Blend overlay with original for semi-transparent bar
+    alpha = 0.6
+    blended = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+
+    # Put text in the bottom center
+    text = "BANANA DETECTED!"
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = max(1.0, w / 600)
+    thickness = 3
+    text_size, _ = cv2.getTextSize(text, font, font_scale, thickness)
+    text_x = int((w - text_size[0]) / 2)
+    text_y = h - int(rect_h / 2) + int(text_size[1] / 2)
+
+    cv2.putText(blended, text, (text_x, text_y), font, font_scale, (0, 255, 255), thickness, cv2.LINE_AA)
+
+    # Show the blended frame repeatedly for the given duration
+    start = time.time()
+    while True:
+        cv2.imshow("Live Webcam Feed (press 'q' to quit)", blended)
+        key = cv2.waitKey(50) & 0xFF
+        if key == ord('q'):
+            # propagate quit to main loop by raising KeyboardInterrupt
+            raise KeyboardInterrupt()
+        if time.time() - start >= seconds:
+            break
+
 def clear_folder(folder_path):
     if os.path.exists(folder_path):
         for filename in os.listdir(folder_path):
@@ -193,11 +236,14 @@ def main():
                 #3) If banana detected -> keep and show results, otherwise schedule delete
                 if banana_found:
                     print(f"Banana detected; keeping {filename}")
-                    # Show modal with results and pause until user continues
+                    # Show a short overlay on the live feed and pause for 2 seconds
                     try:
-                        show_result_modal(frame, payload)
+                        show_detected_overlay(frame, seconds=2)
+                    except KeyboardInterrupt:
+                        # propagate so outer loop can cleanly exit
+                        raise
                     except Exception as e:
-                        print(f"Failed to show result modal: {e}")
+                        print(f"Failed to show detection overlay: {e}")
                 else:
                     pending_delete[filename] = now
                     print(f"No banana; deleting {filename} in {delete_delay} seconds")
